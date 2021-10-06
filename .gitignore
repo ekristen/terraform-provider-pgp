@@ -39,3 +39,4 @@ terraform
 *.plan
 *.lock.hcl
 vendor
+.envrc

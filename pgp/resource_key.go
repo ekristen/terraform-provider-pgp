@@ -1,6 +1,7 @@
 package pgp
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/base64"
 	"fmt"
@@ -37,16 +38,24 @@ func resourceKey() *schema.Resource {
 			},
 
 			"public_key": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Armored PGP Public Key",
+			},
+			"public_key_base64": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Base64 Encoded Public Key",
 			},
 			"private_key": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Armored PGP Private Key",
 			},
 			"private_key_base64": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Base64 Encoded Private Key",
 			},
 		},
 		Importer: &schema.ResourceImporter{
@@ -73,29 +82,50 @@ func resourceKeyCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// PublicKey
+	b64buf := new(bytes.Buffer)
+	b64w := bufio.NewWriter(b64buf)
+
 	buf := new(bytes.Buffer)
 	w, err := armor.Encode(buf, openpgp.PublicKeyType, nil)
 	if err != nil {
 		return errwrap.Wrapf("error armor pgp keys: {{err}}", err)
 	}
+
 	e.Serialize(w)
+	e.Serialize(b64w)
+
 	w.Close()
-	pubKey := buf.String()
+	b64w.Flush()
+
+	base64PubKey := base64.StdEncoding.EncodeToString(b64buf.Bytes())
+	armoredPubKey := buf.String()
 
 	// PrivateKey
+	b64buf = new(bytes.Buffer)
+	b64w = bufio.NewWriter(b64buf)
+
 	buf = new(bytes.Buffer)
 	w, err = armor.Encode(buf, openpgp.PrivateKeyType, nil)
 	if err != nil {
 		return errwrap.Wrapf("error armor pgp keys: {{err}}", err)
 	}
+
 	e.SerializePrivate(w, nil)
+	e.SerializePrivate(b64w, nil)
+
 	w.Close()
-	privateKey := buf.String()
+	b64w.Flush()
+
+	base64PrivateKey := base64.StdEncoding.EncodeToString(b64buf.Bytes())
+	armoredPrivateKey := buf.String()
 
 	d.SetId(fmt.Sprintf("%x", e.PrimaryKey.Fingerprint))
-	d.Set("public_key", pubKey)
-	d.Set("private_key", privateKey)
-	d.Set("private_key_base64", base64.StdEncoding.EncodeToString(buf.Bytes()))
+
+	d.Set("public_key", armoredPubKey)
+	d.Set("public_key_base64", base64PubKey)
+
+	d.Set("private_key", armoredPrivateKey)
+	d.Set("private_key_base64", base64PrivateKey)
 
 	return nil
 }

@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     pgp = {
-      version = "0.1.0"
+      version = "0.2.0"
       source  = "hashicorp.com/ekristen/pgp"
     }
   }
@@ -18,10 +18,6 @@ resource "pgp_key" "testing" {
 data "pgp_encrypt" "testing" {
   plaintext  = "thisisasecret"
   public_key = pgp_key.testing.public_key
-}
-
-output "ciphertext" {
-  value = data.pgp_encrypt.testing.ciphertext
 }
 
 data "pgp_decrypt" "testing" {
@@ -41,6 +37,9 @@ output "private_key_base64" {
   value = pgp_key.testing.private_key_base64
 }
 
+output "ciphertext" {
+  value = data.pgp_encrypt.testing.ciphertext
+}
 output "plaintext" {
   value = data.pgp_decrypt.testing.plaintext
 }
