@@ -22,6 +22,7 @@ data "pgp_decrypt" "example" {
 
 - `private_key` - (Required) PGP Private Key in Armored Format
 - `ciphertext` - (Required) Ciphertext to be decrypted by the Private Key
+- `ciphertext_encoding` - (Optional) The encoding of the ciphertext (default: armored) - valid options: `armored` or `base64`
 
 ## Attributes Reference
 
