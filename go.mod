@@ -12,5 +12,5 @@ require (
 	github.com/jchavannes/go-pgp v0.0.0-20200131171414-e5978e6d02b4 // indirect
 	github.com/keybase/go-crypto v0.0.0-20161004153544-93f5b35093ba // indirect
 	github.com/pierrec/lz4 v2.0.5+incompatible // indirect
-	golang.org/x/crypto v0.0.0-20211209193657-4570a0811e8b
+	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
 )
