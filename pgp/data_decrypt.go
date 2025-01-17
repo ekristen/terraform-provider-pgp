@@ -25,6 +25,7 @@ func dataSourceDecrypt() *schema.Resource {
 			"plaintext": {
 				Type:     schema.TypeString,
 				Computed: true,
+				Sensitive: true,
 			},
 			"private_key": {
 				Type:     schema.TypeString,
